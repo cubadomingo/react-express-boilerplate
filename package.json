@@ -6,12 +6,18 @@
     "node": ">=7.10.0"
   },
   "scripts": {
-    "start": "nodemon src/server.js --exec babel-node",
-    "test": "NODE_ENV=test mocha test/**/*.js -w --compilers js:babel-register",
-    "make": "knex migrate:make",
-    "rollback": "knex migrate:rollback",
-    "latest": "knex migrate:latest",
-    "seed": "babel-node node_modules/.bin/knex seed:run"
+    "start": "yarn start:client | yarn start:server",
+    "start:client": "nodemon --watch webpack.config.dev.js --exec \"webpack-dev-server --host 0.0.0.0 --config webpack.config.dev.js --progress --inline --colors\"",
+    "start:server": "nodemon src/server/server.js --exec babel-node",
+    "test:client": "NODE_PATH=./src/client NODE_ENV=test mocha --watch --compilers js:babel-core/register --compilers jsx:babel-register --require test/client/setup.js ./test/client/*/*.spec.js* || true",
+    "test:server": "NODE_ENV=test mocha test/server/**/*.spec.js -w --compilers js:babel-register",
+    "build:client": "rm -rf build/client && webpack --config webpack.config.prod.js --env production --hide-modules --progress",
+    "build:server": "rm -rf build/server && babel ./src/server -d build/server",
+    "make": "babel-node node_modules/.bin/knex migrate:make",
+    "rollback": "babel-node node_modules/.bin/knex migrate:rollback",
+    "latest": "babel-node node_modules/.bin/knex migrate:latest",
+    "seed:make": "babel-node node_modules/.bin/knex seed:make",
+    "seed:run": "babel-node node_modules/.bin/knex seed:run"
   },
   "dependencies": {
     "bcrypt": "^1.0.2",
